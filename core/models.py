@@ -16,8 +16,10 @@ class Genre(Base):
 
     __tablename__ = 'genre'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    genre_id: Mapped[int] = mapped_column(primary_key=True)
+    name_genre: Mapped[str] = mapped_column(
+        String, nullable=False, unique=True
+    )
 
     books: Mapped[List['Book']] = relationship(
         back_populates='genre', cascade='all, delete-orphan'
@@ -29,8 +31,8 @@ class Author(Base):
 
     __tablename__ = 'author'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    author_id: Mapped[int] = mapped_column(primary_key=True)
+    name_author: Mapped[str] = mapped_column(String, nullable=False)
 
     books: Mapped[List['Book']] = relationship(
         back_populates='author', cascade='all, delete-orphan'
@@ -42,8 +44,8 @@ class City(Base):
 
     __tablename__ = 'city'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    city_id: Mapped[int] = mapped_column(primary_key=True)
+    name_city: Mapped[str] = mapped_column(String, nullable=False)
     days_delivery: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     clients: Mapped[List['Client']] = relationship(
@@ -56,15 +58,15 @@ class Book(Base):
 
     __tablename__ = 'book'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    book_id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     genre_id: Mapped[int] = mapped_column(
-        ForeignKey('genre.id'), nullable=False
+        ForeignKey('genre.genre_id'), nullable=False
     )
     author_id: Mapped[int] = mapped_column(
-        ForeignKey('author.id'), nullable=False
+        ForeignKey('author.author_id'), nullable=False
     )
 
     genre: Mapped['Genre'] = relationship(back_populates='books')
@@ -79,10 +81,12 @@ class Client(Base):
 
     __tablename__ = 'client'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    client_id: Mapped[int] = mapped_column(primary_key=True)
+    name_client: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    city_id: Mapped[int] = mapped_column(ForeignKey('city.id'), nullable=False)
+    city_id: Mapped[int] = mapped_column(
+        ForeignKey('city.city_id'), nullable=False
+    )
 
     city: Mapped['City'] = relationship(back_populates='clients')
     buys: Mapped[List['Buy']] = relationship(
@@ -95,10 +99,10 @@ class Buy(Base):
 
     __tablename__ = 'buy'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    description: Mapped[Optional[str]] = mapped_column(Text)
+    buy_id: Mapped[int] = mapped_column(primary_key=True)
+    buy_description: Mapped[Optional[str]] = mapped_column(Text)
     client_id: Mapped[int] = mapped_column(
-        ForeignKey('client.id'), nullable=False
+        ForeignKey('client.client_id'), nullable=False
     )
 
     client: Mapped['Client'] = relationship(back_populates='buys')
@@ -115,8 +119,8 @@ class Step(Base):
 
     __tablename__ = 'step'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    step_id: Mapped[int] = mapped_column(primary_key=True)
+    name_step: Mapped[str] = mapped_column(String, nullable=False)
 
     buy_steps: Mapped[List['BuyStep']] = relationship(
         back_populates='step', cascade='all, delete-orphan'
@@ -128,10 +132,14 @@ class BuyBook(Base):
 
     __tablename__ = 'buy_book'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    buy_book_id: Mapped[int] = mapped_column(primary_key=True)
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
-    buy_id: Mapped[int] = mapped_column(ForeignKey('buy.id'), nullable=False)
-    book_id: Mapped[int] = mapped_column(ForeignKey('book.id'), nullable=False)
+    buy_id: Mapped[int] = mapped_column(
+        ForeignKey('buy.buy_id'), nullable=False
+    )
+    book_id: Mapped[int] = mapped_column(
+        ForeignKey('book.book_id'), nullable=False
+    )
 
     buy: Mapped['Buy'] = relationship(back_populates='buy_books')
     book: Mapped['Book'] = relationship(back_populates='buy_books')
@@ -142,11 +150,17 @@ class BuyStep(Base):
 
     __tablename__ = 'buy_step'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    step_beg: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-    step_end: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    buy_id: Mapped[int] = mapped_column(ForeignKey('buy.id'), nullable=False)
-    step_id: Mapped[int] = mapped_column(ForeignKey('step.id'), nullable=False)
+    buy_step_id: Mapped[int] = mapped_column(primary_key=True)
+    date_step_beg: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now
+    )
+    date_step_end: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    buy_id: Mapped[int] = mapped_column(
+        ForeignKey('buy.buy_id'), nullable=False
+    )
+    step_id: Mapped[int] = mapped_column(
+        ForeignKey('step.step_id'), nullable=False
+    )
 
     buy: Mapped['Buy'] = relationship(back_populates='buy_steps')
     step: Mapped['Step'] = relationship(back_populates='buy_steps')
